@@ -1,4 +1,4 @@
- #### Challenge 1
+ # Challenge 1
  
 Because it seems that text relates to Azure, I've tried to focus solution in Azure AKS.
 
@@ -80,7 +80,7 @@ spec:
                       - "zone-3"
 ```
 
-#### Challenge 2
+# Challenge 2
 
 ### Terraform module hierarchy:
 
@@ -341,7 +341,7 @@ To perform exactly these actions, run the following command to apply:
     terraform apply "tfplan"
 ```
 
-#### Challenge 3
+# Challenge 3
 
 ```
 name: Deploy Helm Chart to AKS
