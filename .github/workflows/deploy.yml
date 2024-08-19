@@ -1,0 +1,49 @@
+name: Deploy Helm Chart to AKS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch: # Manual invocation from GitHub
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v2
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v1
+        with:
+          cli_config_credentials_token: ${{ secrets.TF_CLI_CONFIG_CREDENTIALS_TOKEN }}
+
+      - name: Initialize Terraform
+        working-directory: Challenge2/
+        run: terraform init
+
+      - name: Terraform Plan
+        working-directory: Challenge2/
+        run: terraform plan -out=tfplan
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main'
+        working-directory: Challenge2/
+        run: terraform apply -auto-approve tfplan
+
+      - name: Deploy Helm Chart
+        working-directory: Challenge1/ping/
+        run: |
+          helm upgrade --install ping . \
+          --set replicaCount=2 \
+          --set service.type=ClusterIP \
+          --set service.port=80 \
+          --set autoscaling.enabled=false \
+          --set ingress.enabled=false \
+          --namespace default
+
+      - name: Clean up Terraform
+        if: always()
+        working-directory: Challenge2/
+        run: terraform destroy -auto-approve
